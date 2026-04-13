@@ -4,6 +4,7 @@ namespace CodersTea.DeeplyDep.Utils;
 
 public static class Logger
 {
+    public static bool isTraceEnabled { get; set; } = false;
     public static void Info(string message)
     {
         Log("INFO", message, ConsoleColor.Cyan);
@@ -22,7 +23,8 @@ public static class Logger
 
     public static void Trace(string message)
     {
-        Log("TRACE", message, ConsoleColor.DarkGray);
+        if(isTraceEnabled)
+            Log("TRACE", message, ConsoleColor.DarkGray);
     }
 
     private static void Log(string level, string message, ConsoleColor color)
