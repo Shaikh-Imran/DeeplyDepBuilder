@@ -6,13 +6,12 @@ namespace CodersTea.DeeplyDep.Parsers;
 
 public class SolutionParser
 {
-    
-    public Solution ParseSolution(string solutionPath)
+    public Node ParseSolution(string solutionPath)
     {
         Logger.Info($"Parsing Solution {solutionPath}");
-        
+
         var content = File.ReadAllText(solutionPath);
-        
+
         var solutionDir = Path.GetDirectoryName(solutionPath);
 
         var solutionNode = new Node()
@@ -23,14 +22,20 @@ public class SolutionParser
             Dependencies = new List<Node>()
         };
 
-        var solution = new Solution()
-        {
-            SolutionRoot = solutionNode,
-        };
-        
+        ParseAndLoadDependentProjects(content, solutionDir, solutionNode);
+
+        Logger.Info($"Solution parsed with {solutionNode.Dependencies.Count} projects");
+
+
+        return solutionNode;
+    }
+
+    private static void ParseAndLoadDependentProjects(string content, string? solutionDir, Node solutionNode)
+    {
         var projectMatches = Regex.Matches(content,
             @"Project\(""\{[^}]+\}""\)\s*=\s*""([^""]+)"",\s*""([^""]+)""");
-
+        
+        Logger.Trace($"Found {projectMatches.Count} project references in solution file");
 
         foreach (var projectMatchGroup in projectMatches.OfType<Match>())
         {
@@ -40,15 +45,16 @@ public class SolutionParser
                 && !projectPath.EndsWith(".fsproj", StringComparison.InvariantCulture)
                )
             {
-                Logger.Error($"Could not find project file {projectPath}");
+                Logger.Trace($"Skipping non-project reference {projectPath}");
                 continue;
             }
 
             var fullPath = PlatformUtil.ToPlatformPath(Path.GetFullPath(Path.Combine(solutionDir ?? "", projectPath)));
-            
-            if(!File.Exists(fullPath))
+
+            if (!File.Exists(fullPath))
             {
-                Logger.Error($"Could not find project file {fullPath}");
+                // TODO: need better handling, may be error log and exit. nio point in building graph if it going to fail anyway.
+                Logger.Error($"Could not find project file {fullPath}. Conitinuing with next project reference.");
                 continue;
             }
 
@@ -58,10 +64,10 @@ public class SolutionParser
                 FullPath = fullPath,
                 NodeType = NodeType.PROJECT
             };
-           
+
             solutionNode.Dependencies.Add(projectNode);
+            Logger.Trace(
+                $"Added project {projectNode.Name} with path {projectNode.FullPath} to solution {solutionNode.Name}");
         }
-        
-        return solution;
     }
 }

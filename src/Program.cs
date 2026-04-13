@@ -11,6 +11,6 @@ public class Program
         var solutionParser = new SolutionParser();
         var solution = solutionParser.ParseSolution("/Users/ishaikh/imran/project/dot-net-dependency-builder/mono-repo-example/MySolution/MySolution.sln");
         
-        solution.SolutionRoot.Dependencies.ForEach(n => Logger.Info(n.ToString()));
+        solution.Dependencies.ForEach(n => Logger.Info(n.ToString()));
     }
 }
