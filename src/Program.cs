@@ -35,7 +35,24 @@ public class Program
             throw new ArgumentException($"Given Solution path does not exist.:  {opts.SolutionPath}");
         }
 
-        var graphBuilder = new GraphBuilderService();
-        graphBuilder.BuildGraph(solutionPath);
+        var graphBuilder = new GraphBuilderService(new SolutionParser(), new ProjectParser());
+        var depencyGraph = graphBuilder.BuildGraph(solutionPath);
+
+        printGraph(depencyGraph);
+    }
+
+    private static void printGraph(DependencyGraph dependencyGraph)
+    {
+        string context = "digraph G {\n";
+
+        foreach (var node in dependencyGraph.AllNodes.Values)
+        {
+            foreach (var depNode in node.Dependencies)
+                context += $"\n\t \"{node.Name}\" -> \"{depNode.Name}\"";
+        }
+
+        context += "\n }";
+
+        File.WriteAllText("graph.dot", context);
     }
 }
