@@ -1,5 +1,6 @@
 ﻿using CodersTea.DeeplyDep.Models;
 using CodersTea.DeeplyDep.Parsers;
+using CodersTea.DeeplyDep.Services;
 using CodersTea.DeeplyDep.Utils;
 using CommandLine;
 
@@ -16,9 +17,25 @@ public class Program
         }
 
         PlatformUtil.CurrentPlatform = Platform.Linux;
-        var solutionParser = new SolutionParser();
-        var solution = solutionParser.ParseSolution(opts.SolutionPath);
 
-        solution.Dependencies.ForEach(n => Logger.Info(n.ToString()));
+        Logger.Info("Starting CodersTea.DeeplyDep CLI");
+
+        var solutionPath = opts.SolutionPath.Trim();
+
+        if (!solutionPath.EndsWith(".sln"))
+        {
+            Logger.Error("Given path is not a solution file. Please provide a valid .sln file path.");
+            throw new ArgumentException("Not a solution file");
+        }
+
+        if (!Path.Exists(solutionPath))
+        {
+            Logger.Error($"Given Solution path does not exist.:  {opts.SolutionPath}");
+            Logger.Error("Exiting...");
+            throw new ArgumentException($"Given Solution path does not exist.:  {opts.SolutionPath}");
+        }
+
+        var graphBuilder = new GraphBuilderService();
+        graphBuilder.BuildGraph(solutionPath);
     }
 }
