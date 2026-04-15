@@ -53,6 +53,6 @@ public class Program
 
         context += "\n }";
 
-        File.WriteAllText("graph.dot", context);
+        File.WriteAllText("/Users/ishaikh/imran/project/dot-net-dependency-builder/DeepDepBuilder/graph.dot", context);
     }
 }

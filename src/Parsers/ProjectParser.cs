@@ -10,19 +10,13 @@ public class ProjectParser
         var projectDoc = XDocument.Parse(File.ReadAllText(projectPath));
         Logger.Trace($"Parsing Project: {projectPath}");
 
-        return projectDoc.Descendants("ItemGroup")
-            .Elements("ProjectReference")
+        var projectFolderPath = Path.GetDirectoryName(projectPath)!;
+        return projectDoc.Descendants("ProjectReference")
             .Select(node => node.Attribute("Include")?.Value)
             .Where(IsValidProjectReference)
-            .Select(currentPath => FullPath(projectPath, currentPath!))
+            .Select(currentPath => PlatformUtil.CombineAndGetFullPlatformPath(projectFolderPath, currentPath!))
+            .Distinct()
             .ToList();
-    }
-
-    private static string FullPath(string projectPath, string currentPath)
-    {
-        var combinedPath = Path.Combine(Path.GetDirectoryName(projectPath) ?? "", currentPath);
-        var fullpath = Path.GetFullPath(combinedPath);
-        return PlatformUtil.ToPlatformPath(fullpath);
     }
 
     private static bool IsValidProjectReference(string? project)

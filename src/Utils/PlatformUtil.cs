@@ -13,4 +13,10 @@ public static class PlatformUtil
 
         return path.Replace("\\", "/");
     }
+    
+    public static string CombineAndGetFullPlatformPath(string basepath, string filePath)
+    {
+        var combinedPath = Path.Combine(basepath, filePath);
+        return Path.GetFullPath(ToPlatformPath(combinedPath));
+    }
 }

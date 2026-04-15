@@ -11,7 +11,7 @@ public class SolutionParser
 
         var content = File.ReadAllText(solutionPath);
 
-        var solutionDir = Path.GetDirectoryName(solutionPath);
+        var solutionDir = Path.GetDirectoryName(solutionPath)!;
 
         var projectMatches = Regex.Matches(content,
             @"Project\(""\{[^}]+\}""\)\s*=\s*""([^""]+)"",\s*""([^""]+)""");
@@ -32,7 +32,7 @@ public class SolutionParser
                 continue;
             }
 
-            var fullPath = PlatformUtil.ToPlatformPath(Path.GetFullPath(Path.Combine(solutionDir ?? "", projectPath)));
+            var fullPath = Path.GetFullPath(PlatformUtil.ToPlatformPath(Path.Combine(solutionDir, projectPath)));
 
             if (!File.Exists(fullPath))
             {
@@ -45,6 +45,6 @@ public class SolutionParser
             Logger.Trace($"Found project {Path.GetFileNameWithoutExtension(fullPath)} with path {fullPath}");
         }
 
-        return projectReferences;
+        return projectReferences.Distinct().ToList();
     }
 }
