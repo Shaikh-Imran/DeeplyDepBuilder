@@ -38,21 +38,25 @@ public class Program
         var graphBuilder = new GraphBuilderService(new SolutionParser(), new ProjectParser());
         var depencyGraph = graphBuilder.BuildGraph(solutionPath);
 
-        printGraph(depencyGraph);
+        if (!string.IsNullOrEmpty(opts.VisualizeGraph))
+            PrintGraph(depencyGraph, opts);
     }
 
-    private static void printGraph(DependencyGraph dependencyGraph)
+    private static void PrintGraph(DependencyGraph dependencyGraph, CliOptions opts)
     {
-        string context = "digraph G {\n";
+        Logger.Info($"Building Visual Graph of diagraph in {opts.VisualizeGraph}");
+        var graph = String.Join('\n',
+            dependencyGraph.AllNodes.Values.Select(node => node.Dependencies.Select(d =>
+                    $"\t '{node.Name}' -> '{d.Name}'".Replace("'", "\"")))
+                .SelectMany(x => x)
+                .ToList()
+        );
 
-        foreach (var node in dependencyGraph.AllNodes.Values)
-        {
-            foreach (var depNode in node.Dependencies)
-                context += $"\n\t \"{node.Name}\" -> \"{depNode.Name}\"";
-        }
+        var dependencyGraphString = $" digraph G {{ \n {graph} \n}}";
 
-        context += "\n }";
-
-        File.WriteAllText("/Users/ishaikh/imran/project/dot-net-dependency-builder/DeeplyDepBuilder/graph.dot", context);
+        File.WriteAllText(
+            opts.VisualizeGraph,
+            dependencyGraphString);
+        Logger.Info($"Diagraph file created at {opts.VisualizeGraph}");
     }
 }

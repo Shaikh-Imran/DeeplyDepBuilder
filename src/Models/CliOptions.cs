@@ -9,4 +9,7 @@ public record CliOptions
 
     [Option('v', "verbose", Required = false, HelpText = "Add Trace Logging")]
     public bool Verbose { get; set; }
+    
+    [Option('g', "graph-visualize",  Required = false, HelpText = "Create Diagraph file for graph visualization" )]
+    public string VisualizeGraph { get; set; }
 }
