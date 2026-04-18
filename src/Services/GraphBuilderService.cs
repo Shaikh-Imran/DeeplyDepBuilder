@@ -19,7 +19,7 @@ public class GraphBuilderService(SolutionParser solutionParser, ProjectParser pr
         {
             Logger.Error($"Cyclic Dependency Found. The Project is already referenced earlier : {projectPath}");
             Logger.Error("Please see logs to figureout the cycle in the graph. You can enable the verbose logs via -v flag.");
-            throw new Exception("Found Cyclic Dependency in the graph at path: " + projectPath);
+            throw new Exception($"Found Cyclic Dependency in the graph at path: {projectPath}");
         }
         
         if (allNodes.TryGetValue(projectPath, out var graph))
