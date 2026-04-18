@@ -14,7 +14,7 @@ public class ProjectParser
         return projectDoc.Descendants("ProjectReference")
             .Select(node => node.Attribute("Include")?.Value)
             .Where(IsValidProjectReference)
-            .Select(currentPath => PlatformUtil.CombineAndGetFullPlatformPath(projectFolderPath, currentPath!))
+            .Select(currentPath => PathUtil.CombineAndGetFullPlatformPath(projectFolderPath, currentPath!))
             .Distinct()
             .ToList();
     }

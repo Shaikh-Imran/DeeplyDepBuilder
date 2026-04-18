@@ -16,7 +16,7 @@ public class Program
             Logger.isTraceEnabled = true;
         }
 
-        PlatformUtil.CurrentPlatform = Platform.Linux;
+        PathUtil.CurrentPlatform = Platform.Linux;
 
         Logger.Info("Starting CodersTea.DeeplyDep CLI");
 
@@ -39,7 +39,10 @@ public class Program
         var depencyGraph = graphBuilder.BuildGraph(solutionPath);
 
         if (!string.IsNullOrEmpty(opts.VisualizeGraph))
-            PrintGraph(depencyGraph, opts);
+        {
+            // PrintGraph(depencyGraph, opts);
+            PrintGraphMermaid(depencyGraph, opts);
+        }
     }
 
     private static void PrintGraph(DependencyGraph dependencyGraph, CliOptions opts)
@@ -58,5 +61,35 @@ public class Program
             opts.VisualizeGraph,
             dependencyGraphString);
         Logger.Info($"Diagraph file created at {opts.VisualizeGraph}");
+    }
+    
+    private static void PrintGraphMermaid(DependencyGraph dependencyGraph, CliOptions opts)
+    {
+        Logger.Info($"Building Visual Graph of Mermaid in {opts.VisualizeGraph}");
+
+        var mermaidNodeDict = dependencyGraph.AllNodes.Values.Select((key, index) => new {key, index}).ToDictionary(
+            x => GetValue(x.key),
+            x => "p" + x.index
+        );
+
+        var nodeNames = string.Join('\n', mermaidNodeDict.Select(kv => $"\t{kv.Value}[\"{kv.Key}\"]"));
+        
+        var graph = String.Join('\n',
+            dependencyGraph.AllNodes.Values.Select(node => node.Dependencies.Select(d =>
+                    $"\t{mermaidNodeDict[GetValue(node)]} --> {mermaidNodeDict[GetValue(d)]}"))
+                .SelectMany(x => x)
+                .ToList()
+        );
+        
+        var dependencyGraphString = $"flowchart TD \n {nodeNames} \n {graph}";
+
+        File.WriteAllText(
+            opts.VisualizeGraph,
+            dependencyGraphString);
+        Logger.Info($"Diagraph file created at {opts.VisualizeGraph}");
+
+        return;
+        
+        string GetValue(Node node) => opts.ShowPathInGraph ? node.FullPath : node.Name;
     }
 }

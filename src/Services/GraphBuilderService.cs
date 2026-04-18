@@ -7,24 +7,9 @@ public class GraphBuilderService(SolutionParser solutionParser, ProjectParser pr
 {
     public DependencyGraph BuildGraph(string solutionPath)
     {
-        var solutionRootNode = new Node
-        (
-            name: Path.GetFileName(solutionPath),
-            fullPath: solutionPath,
-            nodeType: NodeType.SOLUTION
-        );
-
-        var referencedProjects = solutionParser.ParaseAndGetDependentProjects(solutionPath);
-
-        var dependencyGraph = new DependencyGraph(solutionRootNode);
-        dependencyGraph.AllNodes[solutionRootNode.FullPath] = solutionRootNode;
-
-        foreach (var dep in referencedProjects)
-        {
-            solutionRootNode.Dependencies.Add(BuildGraphRec(dep, dependencyGraph.AllNodes));
-        }
-
-        return dependencyGraph;
+        var allNodes = new Dictionary<string, Node>();
+        var rootNode = BuildGraphRec(solutionPath, allNodes);
+        return new DependencyGraph(rootNode, allNodes);
     }
 
     private Node BuildGraphRec(string projectPath, Dictionary<string, Node> allNodes)
@@ -35,10 +20,16 @@ public class GraphBuilderService(SolutionParser solutionParser, ProjectParser pr
             return graph;
         }
 
-        var node = new Node(Path.GetFileNameWithoutExtension(projectPath), projectPath);
+        var projectType = projectPath.EndsWith(".sln") ? NodeType.SOLUTION : NodeType.PROJECT;
+
+        var node = new Node(Path.GetFileNameWithoutExtension(projectPath), projectPath, projectType);
         allNodes[projectPath] = node;
 
-        foreach (var dependency in projectParser.ParseAndGetDependentProjects(projectPath))
+        var dependecies = projectType == NodeType.SOLUTION
+            ? solutionParser.ParaseAndGetDependentProjects(projectPath)
+            : projectParser.ParseAndGetDependentProjects(projectPath);
+
+        foreach (var dependency in dependecies)
         {
             var dependencyNode = BuildGraphRec(dependency, allNodes);
             node.Dependencies.Add(dependencyNode);

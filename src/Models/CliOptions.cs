@@ -12,4 +12,7 @@ public record CliOptions
     
     [Option('g', "graph-visualize",  Required = false, HelpText = "Create Diagraph file for graph visualization" )]
     public string VisualizeGraph { get; set; }
+   
+    [Option('p', "show-path", Required = false, Default = false, HelpText = "If True shows path otherwise File name. Names can have duplicates")]
+    public bool ShowPathInGraph { get; set; }
 }

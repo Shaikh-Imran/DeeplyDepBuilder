@@ -1,6 +1,6 @@
 namespace CodersTea.DeeplyDep.Utils;
 
-public static class PlatformUtil
+public static class PathUtil
 {
     public static Platform CurrentPlatform = Platform.Windows;
 

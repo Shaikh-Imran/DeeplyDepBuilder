@@ -1,13 +1,7 @@
 namespace CodersTea.DeeplyDep.Models;
 
-public class DependencyGraph
+public class DependencyGraph(Node rootNode, Dictionary<string, Node> allNodes)
 {
-    public Node RootNode { get; init; }
-    public Dictionary<string, Node> AllNodes { get; init; }
-
-    public DependencyGraph(Node rootNode)
-    {
-        RootNode = rootNode;
-        AllNodes = new Dictionary<string, Node>();
-    }
+    public Node RootNode { get; init; } = rootNode;
+    public Dictionary<string, Node> AllNodes { get; init; } = allNodes;
 }

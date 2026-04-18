@@ -32,7 +32,7 @@ public class SolutionParser
                 continue;
             }
 
-            var fullPath = Path.GetFullPath(PlatformUtil.ToPlatformPath(Path.Combine(solutionDir, projectPath)));
+            var fullPath = Path.GetFullPath(PathUtil.ToPlatformPath(Path.Combine(solutionDir, projectPath)));
 
             if (!File.Exists(fullPath))
             {
