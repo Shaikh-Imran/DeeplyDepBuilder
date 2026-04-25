@@ -17,7 +17,10 @@ public record CliOptions
         HelpText = "If True shows path otherwise File name. Names can have duplicates")]
     public bool ShowPathInGraph { get; set; }
 
-    [Option("parallel-build", Required = false, Default = true,
+    [Option("parallel-build", Required = false, Default = false,
         HelpText = "If True builds projects in the same level in parallelly otherwise sequentially")]
     public bool BuildInParallel { get; set; }
+    
+    [Option("show-build-output", Required = false, Default = false, HelpText = "If True shows the build output in the console. Please note that output may get jumbled if --parallel-build is true")]
+    public bool ShowBuildOutput { get;  set; }
 }

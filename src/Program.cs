@@ -1,4 +1,4 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
 using CodersTea.DeeplyDep.Models;
 using CodersTea.DeeplyDep.Parsers;
 using CodersTea.DeeplyDep.Services;
@@ -11,6 +11,7 @@ public class Program
 {
     public static async Task Main(string[] args)
     {
+        var watch = Stopwatch.StartNew();
         var opts = Parser.Default.ParseArguments<CliOptions>(args).Value;
         if (opts.Verbose)
         {
@@ -42,6 +43,10 @@ public class Program
         }
 
         await new BuildExecutor().BuildProjects(topoSort, opts);
+        
+        watch.Stop();
+        Logger.Info($"Build completed in {watch.Elapsed.Seconds} seconds");
+        
     }
 
     // diagraph priting

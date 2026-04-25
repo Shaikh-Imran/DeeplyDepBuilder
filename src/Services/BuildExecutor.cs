@@ -12,7 +12,7 @@ public class BuildExecutor
 
         if (options.BuildInParallel)
         {
-            Logger.Info("Building projects in parallel mode");
+            Logger.Info("Building projects in parallel mode. Please note that Build Output may get jumbled.");
         }
 
         var i = -1;
@@ -21,39 +21,77 @@ public class BuildExecutor
             i++;
             Logger.Info($"Building Level {i} with {level.Count} projects");
 
-            var op = new List<Task>();
-            foreach (var node in level)
+            if (options.BuildInParallel)
             {
-                Logger.Info($"Building project: {node.Name} at path: {node.FullPath}");
-                var process = new Process
+                await Task.WhenAll(level.Select(n => BuildProject(n, options)));
+            }
+            else
+            {
+                foreach (var node in level)
                 {
-                    StartInfo = new ProcessStartInfo
-                    {
-                        FileName = "dotnet",
-                        Arguments = $"build {node.FullPath}",
-                        RedirectStandardOutput = true,
-                        UseShellExecute = false,
-                        CreateNoWindow = true,
-                    }
-                };
-                process.Start();
-                string output = await process.StandardOutput.ReadToEndAsync();
-                Logger.Trace($"Build output for {node.Name}: {output}");
-
-                if (options.BuildInParallel)
-                {
-                    op.Add(process.WaitForExitAsync());
-                }
-                else
-                {
-                    await process.WaitForExitAsync();
+                    await BuildProject(node, options);
                 }
             }
-
-            if (options.BuildInParallel)
-                await Task.WhenAll(op.ToArray());
         }
 
         Logger.Info("Completed Build Execution for all projects in the graph");
+    }
+
+    private static async Task BuildProject(Node node, CliOptions options)
+    {
+        Logger.Info($"Building project: {node.Name} at path: {node.FullPath}");
+        var process = new Process
+        {
+            StartInfo = new ProcessStartInfo
+            {
+                FileName = "dotnet",
+                Arguments = $"clean {node.FullPath}",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+            }
+        };
+        process.Start();
+
+        await StreamOutputAndExit(process, options);
+
+        if (process.ExitCode != 0)
+            Logger.Error($"Build Failed (ExitCode: {process.ExitCode}). Use the -v flag or build individually");
+
+        Logger.Info($"Building Completed for: {node.Name} at path: {node.FullPath}");
+    }
+
+    private static async Task StreamOutputAndExit(Process process, CliOptions options)
+    {
+        var outputTask = Task.Run(async () =>
+        {
+            if (!options.ShowBuildOutput)
+            {
+                await Task.CompletedTask;
+                return;
+            }
+            while (!process.StandardOutput.EndOfStream)
+            {
+                var line = await process.StandardOutput.ReadLineAsync();
+                if (line != null)
+                    Logger.Info($"[Process]: {line}");
+            }
+        });
+
+        var errorTask = Task.Run(async () =>
+        {
+            while (!process.StandardError.EndOfStream)
+            {
+                var line = await process.StandardError.ReadLineAsync();
+                if (line != null)
+                    Logger.Error($"[Process]: {line}");
+            }
+        });
+
+        await Task.WhenAll(
+            process.WaitForExitAsync(),
+            outputTask,
+            errorTask);
     }
 }
