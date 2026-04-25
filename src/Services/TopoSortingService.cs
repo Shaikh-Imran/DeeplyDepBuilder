@@ -49,7 +49,7 @@ public class TopoSortingService
         }
 
         Logger.Info($"Completed Topo Sort with Total Levels: {levels.Count} for {inDegree} for {inDegree.Count} nodes");
-        // levels.Reverse(); // as we we want to build from leaf to root as per our dependency graph
+        levels.Reverse(); // as we we want to build from leaf to root as per our dependency graph
         return levels;
     }
 }

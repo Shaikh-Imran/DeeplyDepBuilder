@@ -9,10 +9,15 @@ public record CliOptions
 
     [Option('v', "verbose", Required = false, HelpText = "Add Trace Logging")]
     public bool Verbose { get; set; }
-    
-    [Option('g', "graph-visualize",  Required = false, HelpText = "Create Diagraph file for graph visualization" )]
+
+    [Option('g', "graph-visualize", Required = false, HelpText = "Create Diagraph file for graph visualization")]
     public string VisualizeGraph { get; set; }
-   
-    [Option("show-path", Required = false, Default = false, HelpText = "If True shows path otherwise File name. Names can have duplicates")]
+
+    [Option("show-path", Required = false, Default = false,
+        HelpText = "If True shows path otherwise File name. Names can have duplicates")]
     public bool ShowPathInGraph { get; set; }
+
+    [Option("parallel-build", Required = false, Default = true,
+        HelpText = "If True builds projects in the same level in parallelly otherwise sequentially")]
+    public bool BuildInParallel { get; set; }
 }

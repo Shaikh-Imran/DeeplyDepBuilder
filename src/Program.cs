@@ -9,7 +9,7 @@ namespace CodersTea.DeeplyDep;
 
 public class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         var opts = Parser.Default.ParseArguments<CliOptions>(args).Value;
         if (opts.Verbose)
@@ -40,6 +40,8 @@ public class Program
             // PrintGraph(depencyGraph, opts);
             PrintGraphMermaid(depencyGraph, topoSort, opts);
         }
+
+        await new BuildExecutor().BuildProjects(topoSort, opts);
     }
 
     // diagraph priting
