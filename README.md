@@ -97,40 +97,39 @@ Topological Sort
 ```mermaid
 flowchart TD
 
-MS["my Solution"] --> P1["P1"]
-P1 --> P2["P2"]
-P2 --> P3["Shared P3"]
-P3 --> P4["Shared P4"]
+P4["Shared P4"] --> P3["Shared P3"]
+P3 --> P2["P2"]
+P2 --> P1["P1"]
+P1 --> MS["my Solution"]
 ```
 
 
 Topological Sort with Levels
 ```mermaid
 flowchart TD
+    subgraph Level0
+        direction TB
+        P4["Shared P4"]
+    end
 
-subgraph Level0
-MS["my Solution"]
-end
+    subgraph Level1
+        direction TB
+        P3["Shared P3"]
+    end
 
-subgraph Level1
-P1["P1"]
-P2["P2"]
-end
+    subgraph Level2
+        direction TB
+        P1["P1"]
+        P2["P2"]
+    end
 
-subgraph Level2
-P3["Shared P3"]
-end
+    subgraph Level3
+        MS["my Solution"]
+    end
 
-subgraph Level3
-P4["Shared P4"]
-end
-
-MS --> P1
-MS --> P2
-MS --> P4
-
-P2 --> P3
-P3 --> P4
+Level0 --> Level1
+Level1 --> Level2
+Level2 --> Level3
 ```
 ### Complex Example
 Project Structure
@@ -139,15 +138,12 @@ Project Structure
 graph TD
 
 MS["my Solution"]
-
 P1["P1"]
 P2["P2"]
 P3["P3"]
 P8["P8"]
-
 P4["Common P4"]
 P5["Common P5"]
-
 P6["Shared P6"]
 P7["Shared P7"]
 
@@ -157,15 +153,11 @@ MS --> P3
 MS --> P8
 MS --> P4
 MS --> P7
-
 P3 --> P2
-
 P2 --> P5
 P3 --> P5
-
 P4 --> P6
 P2 --> P6
-
 P6 --> P7
 P5 --> P7
 ```
@@ -175,14 +167,14 @@ Topological Sort
 ```mermaid
 flowchart TD
 
-MS["my Solution"] --> P8["P8"]
-P8 --> P1["P1"]
-P1 --> P3["P3"]
-P3 --> P2["P2"]
-P2 --> P4["Common P4"]
-P4 --> P5["Common P5"]
-P5 --> P6["Shared P6"]
-P6 --> P7["Shared P7"]
+P7["Shared P7"] --> P6["Shared P6"]
+P6 --> P5["Common P5"]
+P5 --> P4["Common P4"]
+P4 --> P2["P2"]
+P2 --> P3["P3"]
+P3 --> P1["P1"]
+P1 --> P8["P8"]
+P8 --> MS["my Solution"]
 ```
 
 Topological Sort with Level Groups
@@ -190,46 +182,40 @@ Topological Sort with Level Groups
 ```mermaid
 flowchart TD
 
-subgraph Level0["Level 0 - Root"]
-MS["my Solution"]
-end
+    subgraph Level0["Level 0"]
+        direction TB
+        P7["Shared P7"]
+    end
 
-subgraph Level1["Level 1"]
-P1["P1"]
-P3["P3"]
-P8["P8"]
-P4["Common P4"]
-end
+    subgraph Level1["Level 1"]
+        direction TB
+        P5["Common P5"]
+        P6["Shared P6"]
+    end
 
-subgraph Level2["Level 2"]
-P2["P2"]
-end
+    subgraph Level2["Level 2"]
+        direction TB
+        P2["P2"]
+    end
 
-subgraph Level3["Level 3"]
-P5["Common P5"]
-P6["Shared P6"]
-end
+    subgraph Level3["Level 3"]
+        direction TB
+        P1["P1"]
+        P3["P3"]
+        P8["P8"]
+        P4["Common P4"]
+    end
 
-subgraph Level4["Level 4 - Leaf"]
-P7["Shared P7"]
-end
+    subgraph Level4["Level 4 - Root"]
+        direction TB
+        MS["my Solution"]
+    end
 
-MS --> P1
-MS --> P3
-MS --> P8
-MS --> P4
-MS --> P7
+Level0 --> Level1
+Level1 --> Level2
+Level2 --> Level3
+Level3 --> Level4
 
-P3 --> P2
-
-P2 --> P5
-P3 --> P5
-
-P4 --> P6
-P2 --> P6
-
-P6 --> P7
-P5 --> P7
 ```
 
 ### Examples

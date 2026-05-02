@@ -96,7 +96,7 @@ public class Program
         for (var i = 0; i < topoSorted.Count; i++)
         {
             sb.Add($"\tsubgraph LEVEL{i}");
-            sb.Add($"\t\tdirection TD");
+            sb.Add($"\t\tdirection BT");
             foreach (var node in topoSorted[i])
             {
                 sb.Add($"\t\t{mermaidNodeDict[GetValue(node)]}");
