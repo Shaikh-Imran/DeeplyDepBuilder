@@ -13,6 +13,11 @@ public class Program
     {
         var watch = Stopwatch.StartNew();
         var opts = Parser.Default.ParseArguments<CliOptions>(args).Value;
+        if (opts is null)
+        {
+            return;
+        }
+
         if (opts.Verbose)
         {
             Logger.isTraceEnabled = true;
@@ -43,10 +48,9 @@ public class Program
         }
 
         await new BuildExecutor().BuildProjects(topoSort, opts);
-        
+
         watch.Stop();
         Logger.Info($"Build completed in {watch.Elapsed.Seconds} seconds");
-        
     }
 
     // diagraph priting
