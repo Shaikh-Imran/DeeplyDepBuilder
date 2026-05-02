@@ -41,7 +41,7 @@ public class Program
         var depencyGraph = graphBuilder.BuildGraph(projectOrSolutionPath);
         var topoSort = new TopoSortingService().TopoSortWithLevels(depencyGraph);
 
-        if (!string.IsNullOrEmpty(opts.VisualizeGraph))
+        if (!string.IsNullOrEmpty(opts.VisualizeGraphPath))
         {
             // PrintGraph(depencyGraph, opts);
             PrintGraphMermaid(depencyGraph, topoSort, opts);
@@ -56,7 +56,7 @@ public class Program
     // diagraph priting
     private static void PrintGraph(DependencyGraph dependencyGraph, CliOptions opts)
     {
-        Logger.Info($"Building Visual Graph of diagraph in {opts.VisualizeGraph}");
+        Logger.Info($"Building Visual Graph of diagraph in {opts.VisualizeGraphPath}");
         var graph = String.Join('\n',
             dependencyGraph.AllNodes.Values.Select(node => node.Dependencies.Select(d =>
                     $"\t '{node.Name}' -> '{d.Name}'".Replace("'", "\"")))
@@ -67,14 +67,14 @@ public class Program
         var dependencyGraphString = $" digraph G {{ \n {graph} \n}}";
 
         File.WriteAllText(
-            opts.VisualizeGraph,
+            opts.VisualizeGraphPath,
             dependencyGraphString);
-        Logger.Info($"Diagraph file created at {opts.VisualizeGraph}");
+        Logger.Info($"Diagraph file created at {opts.VisualizeGraphPath}");
     }
 
     private static void PrintGraphMermaid(DependencyGraph dependencyGraph, List<List<Node>> topoSorted, CliOptions opts)
     {
-        Logger.Info($"Building Visual Graph of Mermaid in {opts.VisualizeGraph}");
+        Logger.Info($"Building Visual Graph of Mermaid in {opts.VisualizeGraphPath}");
 
         var mermaidNodeDict = dependencyGraph.AllNodes.Values.Select((key, index) => new { key, index }).ToDictionary(
             x => GetValue(x.key),
@@ -134,11 +134,11 @@ public class Program
                         ```
                         """;
 
-        File.WriteAllText(opts.VisualizeGraph, fileData);
-        Logger.Info($"Diagram file created at {opts.VisualizeGraph}");
+        File.WriteAllText(opts.VisualizeGraphPath, fileData);
+        Logger.Info($"Diagram file created at {opts.VisualizeGraphPath}");
 
         return;
 
-        string GetValue(Node node) => opts.ShowPathInGraph ? node.FullPath : node.Name;
+        string GetValue(Node node) => opts.HidePathInGraph ? node.Name : node.FullPath;
     }
 }

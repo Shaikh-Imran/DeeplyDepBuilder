@@ -10,17 +10,19 @@ public record CliOptions
     [Option('v', "verbose", Required = false, HelpText = "Add Trace Logging")]
     public bool Verbose { get; set; }
 
-    [Option('g', "graph-visualize", Required = false, HelpText = "Create Diagraph file for graph visualization")]
-    public string VisualizeGraph { get; set; }
+    [Option('g', "generate-graph-path", Required = false, HelpText = "Generate markdown file for graph visualization in given path")]
+    public string VisualizeGraphPath { get; set; }
 
-    [Option("show-path", Required = false, Default = false,
-        HelpText = "If True shows path otherwise File name. Names can have duplicates")]
-    public bool ShowPathInGraph { get; set; }
+    [Option("hide-path-in-graph", Required = false, Default = false,
+        HelpText = "In visual graph, if false shows path otherwise File name. Use only when names are unique")]
+    public bool HidePathInGraph { get; set; }
 
-    [Option("parallel-build", Required = false, Default = false,
-        HelpText = "If True builds projects in the same level in parallelly otherwise sequentially")]
-    public bool BuildInParallel { get; set; }
-    
-    [Option("show-build-output", Required = false, Default = false, HelpText = "If True shows the build output in the console. Please note that output may get jumbled if --parallel-build is true")]
-    public bool ShowBuildOutput { get;  set; }
+    [Option("no-parallel", Required = false, Default = false,
+        HelpText = "If false builds projects in the same level in parallelly otherwise sequentially")]
+    public bool NoParallelBuild { get; set; }
+
+    [Option("show-build-output", Required = false, Default = false,
+        HelpText =
+            "If True shows the build output in the console. Please note that output may get jumbled if --parallel-build is true")]
+    public bool ShowBuildOutput { get; set; }
 }

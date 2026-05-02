@@ -10,10 +10,9 @@ public class BuildExecutor
     {
         Logger.Info("Starting Build Execution for all projects in the graph");
 
-        if (options.BuildInParallel)
-        {
-            Logger.Info("Building projects in parallel mode. Please note that Build Output may get jumbled.");
-        }
+        Logger.Info(options.NoParallelBuild
+            ? "Building Project in Sequential Mode."
+            : "Building projects in parallel mode. Please note that Build Output may get jumbled.");
 
         var i = -1;
         foreach (var level in projects)
@@ -21,17 +20,19 @@ public class BuildExecutor
             i++;
             Logger.Info($"Building Level {i} with {level.Count} projects");
 
-            if (options.BuildInParallel)
-            {
-                await Task.WhenAll(level.Select(n => BuildProject(n, options)));
-            }
-            else
+            if (options.NoParallelBuild)
             {
                 foreach (var node in level)
                 {
                     await BuildProject(node, options);
                 }
             }
+            else
+            {
+                await Task.WhenAll(level.Select(n => BuildProject(n, options)));
+            }
+            
+            Logger.Info($"Completed Building Level {i} with {level.Count} projects");
         }
 
         Logger.Info("Completed Build Execution for all projects in the graph");
@@ -39,13 +40,13 @@ public class BuildExecutor
 
     private static async Task BuildProject(Node node, CliOptions options)
     {
-        Logger.Info($"Building project: {node.Name} at path: {node.FullPath}");
+        Logger.Trace($"Building project: {node.Name} at path: {node.FullPath}");
         var process = new Process
         {
             StartInfo = new ProcessStartInfo
             {
                 FileName = "dotnet",
-                Arguments = $"clean {node.FullPath}",
+                Arguments = $"build {node.FullPath}",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
@@ -59,7 +60,7 @@ public class BuildExecutor
         if (process.ExitCode != 0)
             Logger.Error($"Build Failed (ExitCode: {process.ExitCode}). Use the -v flag or build individually");
 
-        Logger.Info($"Building Completed for: {node.Name} at path: {node.FullPath}");
+        Logger.Trace($"Building Completed for: {node.Name} at path: {node.FullPath}");
     }
 
     private static async Task StreamOutputAndExit(Process process, CliOptions options)
@@ -71,6 +72,7 @@ public class BuildExecutor
                 await Task.CompletedTask;
                 return;
             }
+
             while (!process.StandardOutput.EndOfStream)
             {
                 var line = await process.StandardOutput.ReadLineAsync();
