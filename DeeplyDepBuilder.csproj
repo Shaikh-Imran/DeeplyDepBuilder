@@ -8,7 +8,18 @@
 
         <PackAsTool>true</PackAsTool>
         <ToolCommandName>deeplydep</ToolCommandName>
+
         <PackageOutputPath>./nupkg</PackageOutputPath>
+        <PackageId>CodersTea.DeeplyDepBuilder</PackageId>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <Version>0.1.0</Version>
+        
+        <Authors>Imran Shaikh</Authors>
+        <Company>imran@coderstea.in</Company>
+        <Copyright>Copyright © $([System.DateTime]::Now.Year) - Imran Shaikh and CodersTea.in</Copyright>
+        <PackageProjectUrl>https://github.com/Shaikh-Imran/DeeplyDepBuilder</PackageProjectUrl>
+
+
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="CommandLineParser" Version="2.9.1"/>

@@ -9,11 +9,12 @@ public record CliOptions
 
     [Option('v', "verbose", Required = false, HelpText = "Add Trace Logging")]
     public bool Verbose { get; set; }
-   
+
     [Option('c', "clean", Required = false, Default = false, HelpText = "Do Dotnet Clean instead of Dotnet Build")]
     public bool Clean { get; set; }
 
-    [Option('g', "generate-graph-path", Required = false, HelpText = "Generate markdown file for graph visualization in given path")]
+    [Option('g', "generate-graph-path", Required = false,
+        HelpText = "Generate markdown file for graph visualization in given path")]
     public string VisualizeGraphPath { get; set; }
 
     [Option("hide-path-in-graph", Required = false, Default = false,
@@ -25,7 +26,6 @@ public record CliOptions
     public bool NoParallelBuild { get; set; }
 
     [Option("show-build-output", Required = false, Default = false,
-        HelpText =
-            "If True shows the build output in the console. Please note that output may get jumbled if --parallel-build is true")]
+        HelpText = "If True shows the build output in the console")]
     public bool ShowBuildOutput { get; set; }
 }
