@@ -6,19 +6,23 @@ namespace CodersTea.DeeplyDep.Services;
 
 public class BuildExecutor
 {
+    private static string DotnetAction(CliOptions options) => options.Clean ? "clean" : "build";
+
     public async Task BuildProjects(List<List<Node>> projects, CliOptions options)
     {
-        Logger.Info("Starting Build Execution for all projects in the graph");
+        var dotnetActionMsg = DotnetAction(options) + "ing";
+
+        Logger.Info($"Starting dotnet {DotnetAction(options)} for all projects in the graph");
 
         Logger.Info(options.NoParallelBuild
-            ? "Building Project in Sequential Mode."
-            : "Building projects in parallel mode. Please note that Build Output may get jumbled.");
+            ? $"{dotnetActionMsg} Project in Sequential Mode."
+            : $"{dotnetActionMsg} projects in parallel mode. Please note that Output may get jumbled.");
 
         var i = -1;
         foreach (var level in projects)
         {
             i++;
-            Logger.Info($"Building Level {i} with {level.Count} projects");
+            Logger.Info($"{dotnetActionMsg} Level {i} with {level.Count} projects");
 
             if (options.NoParallelBuild)
             {
@@ -31,8 +35,8 @@ public class BuildExecutor
             {
                 await Task.WhenAll(level.Select(n => BuildProject(n, options)));
             }
-            
-            Logger.Info($"Completed Building Level {i} with {level.Count} projects");
+
+            Logger.Info($"Completed {dotnetActionMsg} Level {i} with {level.Count} projects");
         }
 
         Logger.Info("Completed Build Execution for all projects in the graph");
@@ -40,13 +44,13 @@ public class BuildExecutor
 
     private static async Task BuildProject(Node node, CliOptions options)
     {
-        Logger.Trace($"Building project: {node.Name} at path: {node.FullPath}");
+        Logger.Trace($"{DotnetAction(options)}ing project: {node.Name} at path: {node.FullPath}");
         var process = new Process
         {
             StartInfo = new ProcessStartInfo
             {
                 FileName = "dotnet",
-                Arguments = $"build {node.FullPath}",
+                Arguments = $"{DotnetAction(options)} {node.FullPath}",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
@@ -58,9 +62,10 @@ public class BuildExecutor
         await StreamOutputAndExit(process, options);
 
         if (process.ExitCode != 0)
-            Logger.Error($"Build Failed (ExitCode: {process.ExitCode}). Use the -v flag or build individually");
+            Logger.Error(
+                $"{DotnetAction(options)}ing  Failed (ExitCode: {process.ExitCode}). Use the -v flag or build individually");
 
-        Logger.Trace($"Building Completed for: {node.Name} at path: {node.FullPath}");
+        Logger.Trace($"{DotnetAction(options)}ing Completed for: {node.Name} at path: {node.FullPath}");
     }
 
     private static async Task StreamOutputAndExit(Process process, CliOptions options)

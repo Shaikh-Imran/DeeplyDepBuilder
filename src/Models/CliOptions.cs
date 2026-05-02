@@ -9,6 +9,9 @@ public record CliOptions
 
     [Option('v', "verbose", Required = false, HelpText = "Add Trace Logging")]
     public bool Verbose { get; set; }
+   
+    [Option('c', "clean", Required = false, Default = false, HelpText = "Do Dotnet Clean instead of Dotnet Build")]
+    public bool Clean { get; set; }
 
     [Option('g', "generate-graph-path", Required = false, HelpText = "Generate markdown file for graph visualization in given path")]
     public string VisualizeGraphPath { get; set; }
