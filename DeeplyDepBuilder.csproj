@@ -13,6 +13,7 @@
         <PackageId>CodersTea.DeeplyDepBuilder</PackageId>
         <Version>1.0.0</Version>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Description>Build All Transative Project References / Dependencies of the Given Project</Description>
         <Authors>Imran Shaikh</Authors>
         <Company>imran@coderstea.in</Company>
 
