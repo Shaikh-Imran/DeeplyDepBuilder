@@ -15,7 +15,7 @@ public record CliOptions
 
     [Option('g', "generate-graph-path", Required = false,
         HelpText = "Generate markdown file for graph visualization in given path")]
-    public string VisualizeGraphPath { get; set; }
+    public string? VisualizeGraphPath { get; set; }
 
     [Option("hide-path-in-graph", Required = false, Default = false,
         HelpText = "In visual graph, if false shows path otherwise File name. Use only when names are unique")]

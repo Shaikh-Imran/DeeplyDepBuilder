@@ -1,12 +1,14 @@
+
+using System.Runtime.InteropServices;
+
 namespace CodersTea.DeeplyDep.Utils;
+
 
 public static class PathUtil
 {
-    public static Platform CurrentPlatform = Platform.Windows;
-
     public static string ToPlatformPath(string path)
     {
-        if (CurrentPlatform == Platform.Windows)
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             return path.Replace("/", "\\");
         }

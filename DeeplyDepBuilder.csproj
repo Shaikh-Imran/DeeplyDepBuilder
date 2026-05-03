@@ -13,7 +13,8 @@
         <PackageId>CodersTea.DeeplyDepBuilder</PackageId>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <Version>0.1.0</Version>
-        
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+
         <Authors>Imran Shaikh</Authors>
         <Company>imran@coderstea.in</Company>
         <Copyright>Copyright © $([System.DateTime]::Now.Year) - Imran Shaikh and CodersTea.in</Copyright>

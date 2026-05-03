@@ -9,7 +9,20 @@ namespace CodersTea.DeeplyDep;
 
 public class Program
 {
-    public static async Task Main(string[] args)
+    public static void Main(string[] args)
+    {
+        try
+        {
+            Run(args).GetAwaiter().GetResult();
+        }
+        catch (Exception)
+        {
+            Logger.Error(
+                "An error occurred during execution. Enable -v for verbose and/or --show-build-output for dotnet build output to get more details.");
+        }
+    }
+
+    private static async Task Run(string[] args)
     {
         var watch = Stopwatch.StartNew();
         var opts = Parser.Default.ParseArguments<CliOptions>(args).Value;
@@ -22,8 +35,6 @@ public class Program
         {
             Logger.isTraceEnabled = true;
         }
-
-        PathUtil.CurrentPlatform = Platform.Linux; // TODO: get automatic platform
 
         Logger.Info("Starting CodersTea.DeeplyDep CLI");
 
@@ -53,24 +64,6 @@ public class Program
         Logger.Info($"Build completed in {watch.Elapsed.Seconds} seconds");
     }
 
-    // diagraph priting
-    private static void PrintGraph(DependencyGraph dependencyGraph, CliOptions opts)
-    {
-        Logger.Info($"Building Visual Graph of diagraph in {opts.VisualizeGraphPath}");
-        var graph = String.Join('\n',
-            dependencyGraph.AllNodes.Values.Select(node => node.Dependencies.Select(d =>
-                    $"\t '{node.Name}' -> '{d.Name}'".Replace("'", "\"")))
-                .SelectMany(x => x)
-                .ToList()
-        );
-
-        var dependencyGraphString = $" digraph G {{ \n {graph} \n}}";
-
-        File.WriteAllText(
-            opts.VisualizeGraphPath,
-            dependencyGraphString);
-        Logger.Info($"Diagraph file created at {opts.VisualizeGraphPath}");
-    }
 
     private static void PrintGraphMermaid(DependencyGraph dependencyGraph, List<List<Node>> topoSorted, CliOptions opts)
     {
@@ -134,11 +127,30 @@ public class Program
                         ```
                         """;
 
-        File.WriteAllText(opts.VisualizeGraphPath, fileData);
+        File.WriteAllText(opts.VisualizeGraphPath!, fileData);
         Logger.Info($"Diagram file created at {opts.VisualizeGraphPath}");
 
         return;
 
         string GetValue(Node node) => opts.HidePathInGraph ? node.Name : node.FullPath;
     }
+    
+    // diagraph priting
+    // private static void PrintGraph(DependencyGraph dependencyGraph, CliOptions opts)
+    // {
+    //     Logger.Info($"Building Visual Graph of diagraph in {opts.VisualizeGraphPath}");
+    //     var graph = String.Join('\n',
+    //         dependencyGraph.AllNodes.Values.Select(node => node.Dependencies.Select(d =>
+    //                 $"\t '{node.Name}' -> '{d.Name}'".Replace("'", "\"")))
+    //             .SelectMany(x => x)
+    //             .ToList()
+    //     );
+    //
+    //     var dependencyGraphString = $" digraph G {{ \n {graph} \n}}";
+    //
+    //     File.WriteAllText(
+    //         opts.VisualizeGraphPath!,
+    //         dependencyGraphString);
+    //     Logger.Info($"Diagraph file created at {opts.VisualizeGraphPath}");
+    // }
 }

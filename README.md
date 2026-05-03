@@ -71,6 +71,8 @@ dotnet run -- -p <Path-to-Solution-Or-Project>
 
  This Repo: https://github.com/Shaikh-Imran/dotnet-mono-repo-example is generated based on this graph.
 
+> Note: To Test out Cycle Detection use the branch `cyclic-dep` or this url: https://github.com/Shaikh-Imran/dotnet-mono-repo-example/tree/cyclic-dep
+
 ### Simple Example
 
 Project Structure
@@ -242,3 +244,13 @@ deeplydep -p /path/to/your/solution.sln -g /path/to/output/graph.md
 deeplydep -p /path/to/your/solution.sln --no-parallel --show-build-output
 ```
 
+
+## TODO
+- [x] Graph Visulization
+- [x] Graph Cycle Detection
+- [x] Graph Level Grouping
+- [x] Graph Level Parallel Build
+- [x] Clean Build
+- [ ] No build if latest build is up to date
+- [ ] Path Shortening in graph for better visualization
+- [ ] Terminal Graph Visualization??
