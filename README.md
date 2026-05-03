@@ -19,7 +19,7 @@ The Features of this tool
 
 ```bash
 dotnet pack
-dotnet tool install --global --add-source ./nupkg deeplydepbuilder
+dotnet tool install --global --add-source ./nupkg CodersTea.DeeplyDepBuilder 
 
 # Once installed run the command
 deeplydep --help
