@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <RootNamespace>CodersTea.DeeplyDep</RootNamespace>
         <OutputType>Exe</OutputType>
@@ -11,18 +11,29 @@
 
         <PackageOutputPath>./nupkg</PackageOutputPath>
         <PackageId>CodersTea.DeeplyDepBuilder</PackageId>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <Version>0.1.0</Version>
+        <Version>1.0.0</Version>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-
         <Authors>Imran Shaikh</Authors>
         <Company>imran@coderstea.in</Company>
+
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageLicenseFile>LICENSE</PackageLicenseFile>
+        <PackageTags>tool;build-tool;dependecy-builder;depndency-graph;parallel-build</PackageTags>
+        <PackageReleaseNotes>https://github.com/Shaikh-Imran/DeeplyDepBuilder/blob/main/CHANGELOG.md</PackageReleaseNotes>
+        <PackageIcon>DeeplyDepBuilder-128X128.png</PackageIcon>
+
         <Copyright>Copyright © $([System.DateTime]::Now.Year) - Imran Shaikh and CodersTea.in</Copyright>
         <PackageProjectUrl>https://github.com/Shaikh-Imran/DeeplyDepBuilder</PackageProjectUrl>
-
-
     </PropertyGroup>
     <ItemGroup>
+        <None Include="README.md" Pack="true" PackagePath="\"/>
+        <None Include="LICENSE" Pack="true" PackagePath="\"/>
+        <None Include="assets/DeeplyDepBuilder-128X128.png" Pack="true" PackagePath="\"/>
+    </ItemGroup>
+    <ItemGroup>
         <PackageReference Include="CommandLineParser" Version="2.9.1"/>
+    </ItemGroup>
+    <ItemGroup>
+        <Folder Include="obj\assets\"/>
     </ItemGroup>
 </Project>

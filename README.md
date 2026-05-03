@@ -1,3 +1,5 @@
+![](assets/DeeplyDepBuilder-128X128.png)
+
 ## DeeplyDepBuilder
 
 Deeply Dependency Builder is a command lime tool to build the complete prject reference depenndency graph of the solution or project.
