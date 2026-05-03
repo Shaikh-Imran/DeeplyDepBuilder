@@ -1,4 +1,4 @@
-![](assets/DeeplyDepBuilder-128X128.png)
+![DeeplyDepBuilder](https://github.com/Shaikh-Imran/DeeplyDepBuilder/blob/main/assets/DeeplyDepBuilder-128X128.png?raw=true)
 
 ## DeeplyDepBuilder
 
@@ -17,8 +17,19 @@ The Features of this tool
 
 ## Installing as a dotnet tool
 
+### Via Nuget
+
+> Note: Go to : [Nuget - CodersTea.DeeplyDepBuilder](https://www.nuget.org/packages/CodersTea.DeeplyDepBuilder) For Latest Version.
+
 ```bash
-dotnet pack
+dotnet tool install --global CodersTea.DeeplyDepBuilder --version 1.0.0
+```
+
+### Via source code
+
+```bash
+# clone the repo and cd into it
+dotnet build DeeplyDepBuilder.sln
 dotnet tool install --global --add-source ./nupkg CodersTea.DeeplyDepBuilder 
 
 # Once installed run the command
