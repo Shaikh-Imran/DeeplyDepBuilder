@@ -1,94 +1,153 @@
-![DeeplyDepBuilder](https://github.com/Shaikh-Imran/DeeplyDepBuilder/blob/main/assets/DeeplyDepBuilder-128X128.png?raw=true)
+<div align="center">
 
-## DeeplyDepBuilder
+<img src="https://raw.githubusercontent.com/Shaikh-Imran/DeeplyDepBuilder/main/assets/DeeplyDepBuilder-128X128.png" alt="DeeplyDepBuilder Logo" width="128" height="128" />
 
-Deeply Dependency Builder is a command lime tool to build the complete prject reference depenndency graph of the solution or project.
-In big projects or monorepos, the dependecy chain can be very deep. The usual dotnet build only builds your current project and not referenced package.
-Visual Studio had option to do that I guess, but not in VsCode or Rider.
+# DeeplyDepBuilder
 
-The Features of this tool
-- Identifies Dependency Cycle
-- Create Mermaid Graph as your solution as Root.
-- Uses Topological Sort with levels. Each level represents independent projects.
-- Each level can be build parallely for speeding up build process.
-- Levels and topo sort is also shown in graph.
-- Can clean the build of the whole graph.
+CLI tool to visualize .NET dependency graphs and build independent project levels in parallel.
 
+[![NuGet Version](https://img.shields.io/nuget/v/CodersTea.DeeplyDepBuilder?style=flat-square)](https://www.nuget.org/packages/CodersTea.DeeplyDepBuilder)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/CodersTea.DeeplyDepBuilder?style=flat-square)](https://www.nuget.org/packages/CodersTea.DeeplyDepBuilder)
+[![.NET](https://img.shields.io/badge/.NET-8.0-512BD4?style=flat-square&logo=dotnet)](https://dotnet.microsoft.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
 
-## Installing as a dotnet tool
+</div>
 
-### Via Nuget
+## Table of Contents
 
-> Note: Go to : [Nuget - CodersTea.DeeplyDepBuilder](https://www.nuget.org/packages/CodersTea.DeeplyDepBuilder) For Latest Version.
+- [Overview](#overview)
+- [Features](#features)
+- [Installation](#installation)
+  - [Via NuGet](#via-nuget)
+  - [From Source](#from-source)
+- [Usage](#usage)
+  - [CLI Options](#cli-options)
+  - [Common Commands](#common-commands)
+- [Dependency Graph Examples](#dependency-graph-examples)
+  - [Simple Example](#simple-example)
+  - [Complex Example](#complex-example)
+- [Roadmap](#roadmap)
+- [License](#license)
+
+---
+
+## Overview
+
+DeeplyDepBuilder analyzes the complete project reference dependency graph of a .NET solution or project.
+
+While `dotnet build` automatically resolves and builds project references, understanding deep dependency chains across large solutions or monorepos remains challenging. DeeplyDepBuilder addresses this by:
+
+- **Visualizing Dependency Graphs**: Generates Mermaid diagrams illustrating project relationships, topological order, and level groupings.
+- **Level-Parallel Builds**: Uses topological sorting to group mutually independent projects into discrete levels and builds them concurrently.
+- **Cycle Detection**: Detects and reports circular dependencies before execution.
+
+> **Note:** Direct performance comparisons and benchmarks between standard `dotnet build` and DeeplyDepBuilder's level-parallel build are currently in progress.
+
+---
+
+## Features
+
+- **Cycle Detection**: Identifies circular references in project dependencies.
+- **Mermaid Graph Generation**: Exports dependency graphs rooted at the target solution or project to Markdown.
+- **Topological Sorting with Level Grouping**: Maps dependencies into execution levels of independent projects.
+- **Level-Parallel Build**: Concurrently builds independent projects within the same topological level.
+- **Clean Support**: Performs `dotnet clean` across the entire resolved dependency graph.
+- **Customizable Graph Output**: Optional flag to display short project names instead of full file paths.
+
+---
+
+## Installation
+
+### Via NuGet
+
+Install DeeplyDepBuilder as a global .NET tool:
 
 ```bash
-dotnet tool install --global CodersTea.DeeplyDepBuilder --version 1.0.0
+dotnet tool install --global CodersTea.DeeplyDepBuilder
 ```
 
-### Via source code
+> Latest package details: [NuGet - CodersTea.DeeplyDepBuilder](https://www.nuget.org/packages/CodersTea.DeeplyDepBuilder)
+
+### From Source
+
+Clone the repository and install the tool locally:
 
 ```bash
-# clone the repo and cd into it
-dotnet build DeeplyDepBuilder.sln
-dotnet tool install --global --add-source ./nupkg CodersTea.DeeplyDepBuilder 
+# Clone the repository
+git clone https://github.com/Shaikh-Imran/DeeplyDepBuilder.git
+cd DeeplyDepBuilder
 
-# Once installed run the command
+# Build solution and create package
+dotnet build DeeplyDepBuilder.sln
+
+# Install globally from local package source
+dotnet tool install --global --add-source ./nupkg CodersTea.DeeplyDepBuilder
+
+# Verify installation
 deeplydep --help
 ```
-> If you are using it alot, consider generate a alias as `dpd`
+
+---
 
 ## Usage
 
-You can run the tool by passing the required project or solution path. 
+Run `deeplydep` by passing the target `.sln` or `.csproj` path:
 
 ```bash
-deeplydep -p /path/to/your/project.csproj
+deeplydep -p /path/to/solution.sln
 ```
 
+If running directly from source:
 
-if running from the source:
 ```bash
-dotnet run -- -p <Path-to-Solution-Or-Project>
+dotnet run --project DeeplyDepBuilder.csproj -- -p /path/to/solution.sln
 ```
 
 ### CLI Options
 
-**Required**:
+| Option | Short | Default | Description |
+|---|---|---|---|
+| `--project` | `-p` | *Required* | Full path to .NET project (`.csproj`) or solution (`.sln`). |
+| `--clean` | `-c` | `false` | Run `dotnet clean` instead of `dotnet build`. |
+| `--generate-graph-path` | `-g` | - | Output path for generated Markdown file with Mermaid graph visualization. |
+| `--hide-path-in-graph` | - | `false` | Show project file names instead of full file paths in graphs. Use only when project names are unique. |
+| `--no-parallel` | - | `false` | Build projects sequentially rather than in parallel by level. |
+| `--show-build-output` | - | `false` | Display console build output from `dotnet`. |
+| `--verbose` | `-v` | `false` | Enable trace logging. |
+| `--help` | - | - | Display help screen. |
+| `--version` | - | - | Display version information. |
 
+### Common Commands
+
+**Build a project or solution:**
 ```bash
--p, --project                Required. .Net Project or Solution Full Path
+deeplydep -p /path/to/project.csproj
 ```
 
-**Optional**:
-
+**Clean all dependencies across the graph:**
+```bash
+deeplydep -p /path/to/solution.sln -c
 ```
-  -v, --verbose                Add Trace Logging
 
-  -c, --clean                  (Default: false) Do Dotnet Clean instead of Dotnet Build
+**Generate a dependency graph markdown file and build:**
+```bash
+deeplydep -p /path/to/solution.sln -g /path/to/output/graph.md
+```
 
-  -g, --generate-graph-path    Generate markdown file for graph visualization in given path
+**Build sequentially and display dotnet build output:**
+```bash
+deeplydep -p /path/to/solution.sln --no-parallel --show-build-output
+```
 
-  --hide-path-in-graph         (Default: false) In visual graph, if false shows path otherwise File name. Use only when names are unique
+---
 
-  --no-parallel                (Default: false) If false builds projects in the same level in parallelly otherwise sequentially
+## Dependency Graph Examples
 
-  --show-build-output          (Default: false) If True shows the build output in the console.
-
-  --help                       Display this help screen.
-
-  --version                    Display version information.
-  
-  ```
-
-## Example with Graphs
-
- This Repo: https://github.com/Shaikh-Imran/dotnet-mono-repo-example is generated based on this graph.
-
-> Note: To Test out Cycle Detection use the branch `cyclic-dep` or this url: https://github.com/Shaikh-Imran/dotnet-mono-repo-example/tree/cyclic-dep
+Sample repository for testing: [dotnet-mono-repo-example](https://github.com/Shaikh-Imran/dotnet-mono-repo-example) (for cycle detection, see the [`cyclic-dep`](https://github.com/Shaikh-Imran/dotnet-mono-repo-example/tree/cyclic-dep) branch).
 
 ### Simple Example
 
-Project Structure
+#### Project Structure
 ```mermaid
 graph TD
 
@@ -107,8 +166,7 @@ P2 --> P3
 P3 --> P4
 ```
 
-
-Topological Sort
+#### Topological Sort
 ```mermaid
 flowchart TD
 
@@ -118,8 +176,7 @@ P2 --> P1["P1"]
 P1 --> MS["my Solution"]
 ```
 
-
-Topological Sort with Levels
+#### Topological Sort with Levels
 ```mermaid
 flowchart TD
     subgraph Level0
@@ -146,9 +203,12 @@ Level0 --> Level1
 Level1 --> Level2
 Level2 --> Level3
 ```
-### Complex Example
-Project Structure
 
+---
+
+### Complex Example
+
+#### Project Structure
 ```mermaid
 graph TD
 
@@ -177,8 +237,7 @@ P6 --> P7
 P5 --> P7
 ```
 
-Topological Sort
-
+#### Topological Sort
 ```mermaid
 flowchart TD
 
@@ -192,8 +251,7 @@ P1 --> P8["P8"]
 P8 --> MS["my Solution"]
 ```
 
-Topological Sort with Level Groups
-
+#### Topological Sort with Level Groups
 ```mermaid
 flowchart TD
 
@@ -230,40 +288,23 @@ Level0 --> Level1
 Level1 --> Level2
 Level2 --> Level3
 Level3 --> Level4
-
 ```
 
-### Examples
+---
 
-Use this https://github.com/Shaikh-Imran/dotnet-mono-repo-example solution for testing.
+## Roadmap
 
-**Build a project:**
-```bash
-deeplydep -p /path/to/your/project.csproj
-```
+- [x] Graph visualization
+- [x] Graph cycle detection
+- [x] Graph level grouping
+- [x] Graph level-parallel build
+- [x] Clean build
+- [ ] Skip build if target is already up-to-date
+- [ ] Path shortening in graph for cleaner visualization
+- [ ] Terminal-based graph visualization
 
-**Clean a solution instead of building:**
-```bash
-deeplydep -p /path/to/your/solution.sln -c
-```
+---
 
-**Generate a dependency graph markdown file and build:**
-```bash
-deeplydep -p /path/to/your/solution.sln -g /path/to/output/graph.md
-```
+## License
 
-**Build sequentially and show dotnet build output:**
-```bash
-deeplydep -p /path/to/your/solution.sln --no-parallel --show-build-output
-```
-
-
-## TODO
-- [x] Graph Visulization
-- [x] Graph Cycle Detection
-- [x] Graph Level Grouping
-- [x] Graph Level Parallel Build
-- [x] Clean Build
-- [ ] No build if latest build is up to date
-- [ ] Path Shortening in graph for better visualization
-- [ ] Terminal Graph Visualization??
+This project is licensed under the [MIT License](LICENSE).
