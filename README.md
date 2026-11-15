@@ -1,153 +1,128 @@
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/Shaikh-Imran/DeeplyDepBuilder/main/assets/DeeplyDepBuilder-128X128.png" alt="DeeplyDepBuilder Logo" width="128" height="128" />
+<img src="https://raw.githubusercontent.com/Shaikh-Imran/DeeplyDepBuilder/main/assets/DeeplyDepBuilder-128X128.png" alt="DeeplyDepBuilder logo" width="128" height="128" />
 
 # DeeplyDepBuilder
 
-CLI tool to visualize .NET dependency graphs and build independent project levels in parallel.
+Visualize .NET project dependencies and build independent projects in parallel.
 
-[![NuGet Version](https://img.shields.io/nuget/v/CodersTea.DeeplyDepBuilder?style=flat-square)](https://www.nuget.org/packages/CodersTea.DeeplyDepBuilder)
-[![NuGet Downloads](https://img.shields.io/nuget/dt/CodersTea.DeeplyDepBuilder?style=flat-square)](https://www.nuget.org/packages/CodersTea.DeeplyDepBuilder)
+[![NuGet version](https://img.shields.io/nuget/v/CodersTea.DeeplyDepBuilder?style=flat-square)](https://www.nuget.org/packages/CodersTea.DeeplyDepBuilder)
+[![NuGet downloads](https://img.shields.io/nuget/dt/CodersTea.DeeplyDepBuilder?style=flat-square)](https://www.nuget.org/packages/CodersTea.DeeplyDepBuilder)
 [![.NET](https://img.shields.io/badge/.NET-8.0-512BD4?style=flat-square&logo=dotnet)](https://dotnet.microsoft.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
 
 </div>
 
-## Table of Contents
+## Table of contents
 
 - [Overview](#overview)
 - [Features](#features)
 - [Installation](#installation)
   - [Via NuGet](#via-nuget)
-  - [From Source](#from-source)
+  - [From source](#from-source)
 - [Usage](#usage)
-  - [CLI Options](#cli-options)
-  - [Common Commands](#common-commands)
-- [Dependency Graph Examples](#dependency-graph-examples)
-  - [Simple Example](#simple-example)
-  - [Complex Example](#complex-example)
+  - [CLI options](#cli-options)
+  - [Examples](#examples)
+- [Dependency graph examples](#dependency-graph-examples)
+  - [Simple example](#simple-example)
+  - [Complex example](#complex-example)
 - [Roadmap](#roadmap)
 - [License](#license)
 
----
-
 ## Overview
 
-DeeplyDepBuilder analyzes the complete project reference dependency graph of a .NET solution or project.
+`dotnet build` builds project references by default. DeeplyDepBuilder adds dependency visualization and level-based parallel execution.
 
-While `dotnet build` automatically resolves and builds project references, understanding deep dependency chains across large solutions or monorepos remains challenging. DeeplyDepBuilder addresses this by:
+The tool parses your solution or project references, flags circular dependencies, and groups projects into discrete levels with a topological sort. Projects within the same level have no dependencies on each other and build in parallel. You can also export the dependency tree as a Mermaid diagram.
 
-- **Visualizing Dependency Graphs**: Generates Mermaid diagrams illustrating project relationships, topological order, and level groupings.
-- **Level-Parallel Builds**: Uses topological sorting to group mutually independent projects into discrete levels and builds them concurrently.
-- **Cycle Detection**: Detects and reports circular dependencies before execution.
-
-> **Note:** Direct performance comparisons and benchmarks between standard `dotnet build` and DeeplyDepBuilder's level-parallel build are currently in progress.
-
----
+Build time comparisons against standard `dotnet build` are not yet benchmarked.
 
 ## Features
 
-- **Cycle Detection**: Identifies circular references in project dependencies.
-- **Mermaid Graph Generation**: Exports dependency graphs rooted at the target solution or project to Markdown.
-- **Topological Sorting with Level Grouping**: Maps dependencies into execution levels of independent projects.
-- **Level-Parallel Build**: Concurrently builds independent projects within the same topological level.
-- **Clean Support**: Performs `dotnet clean` across the entire resolved dependency graph.
-- **Customizable Graph Output**: Optional flag to display short project names instead of full file paths.
-
----
+- Cycle detection to catch circular references before building.
+- Mermaid graph export to Markdown for project trees and topological levels.
+- Level-based topological sort so independent projects build concurrently.
+- Clean command that runs `dotnet clean` across the entire resolved tree.
+- Option to display file names instead of full paths in graphs.
 
 ## Installation
 
 ### Via NuGet
 
-Install DeeplyDepBuilder as a global .NET tool:
+Install the tool globally:
 
 ```bash
 dotnet tool install --global CodersTea.DeeplyDepBuilder
 ```
 
-> Latest package details: [NuGet - CodersTea.DeeplyDepBuilder](https://www.nuget.org/packages/CodersTea.DeeplyDepBuilder)
+Package details are on [NuGet](https://www.nuget.org/packages/CodersTea.DeeplyDepBuilder).
 
-### From Source
-
-Clone the repository and install the tool locally:
+### From source
 
 ```bash
-# Clone the repository
 git clone https://github.com/Shaikh-Imran/DeeplyDepBuilder.git
 cd DeeplyDepBuilder
-
-# Build solution and create package
 dotnet build DeeplyDepBuilder.sln
-
-# Install globally from local package source
 dotnet tool install --global --add-source ./nupkg CodersTea.DeeplyDepBuilder
-
-# Verify installation
-deeplydep --help
 ```
-
----
 
 ## Usage
 
-Run `deeplydep` by passing the target `.sln` or `.csproj` path:
+Pass a solution or project path:
 
 ```bash
 deeplydep -p /path/to/solution.sln
 ```
 
-If running directly from source:
+To run directly from source:
 
 ```bash
 dotnet run --project DeeplyDepBuilder.csproj -- -p /path/to/solution.sln
 ```
 
-### CLI Options
+### CLI options
 
 | Option | Short | Default | Description |
 |---|---|---|---|
-| `--project` | `-p` | *Required* | Full path to .NET project (`.csproj`) or solution (`.sln`). |
-| `--clean` | `-c` | `false` | Run `dotnet clean` instead of `dotnet build`. |
-| `--generate-graph-path` | `-g` | - | Output path for generated Markdown file with Mermaid graph visualization. |
-| `--hide-path-in-graph` | - | `false` | Show project file names instead of full file paths in graphs. Use only when project names are unique. |
-| `--no-parallel` | - | `false` | Build projects sequentially rather than in parallel by level. |
-| `--show-build-output` | - | `false` | Display console build output from `dotnet`. |
-| `--verbose` | `-v` | `false` | Enable trace logging. |
-| `--help` | - | - | Display help screen. |
-| `--version` | - | - | Display version information. |
+| `--project` | `-p` | None (required) | Path to `.csproj` or `.sln` |
+| `--clean` | `-c` | `false` | Run `dotnet clean` instead of `dotnet build` |
+| `--generate-graph-path` | `-g` | None | Write a Markdown file with Mermaid diagrams to this path |
+| `--hide-path-in-graph` | | `false` | Show file names instead of full paths in graphs |
+| `--no-parallel` | | `false` | Build projects sequentially instead of in parallel |
+| `--show-build-output` | | `false` | Print `dotnet` build output to the console |
+| `--verbose` | `-v` | `false` | Print trace logs |
+| `--help` | | | Show help text |
+| `--version` | | | Show version |
 
-### Common Commands
+### Examples
 
-**Build a project or solution:**
+Build a project:
 ```bash
 deeplydep -p /path/to/project.csproj
 ```
 
-**Clean all dependencies across the graph:**
+Clean all projects in the dependency graph:
 ```bash
 deeplydep -p /path/to/solution.sln -c
 ```
 
-**Generate a dependency graph markdown file and build:**
+Generate a Mermaid graph file and build:
 ```bash
 deeplydep -p /path/to/solution.sln -g /path/to/output/graph.md
 ```
 
-**Build sequentially and display dotnet build output:**
+Build sequentially and print build output:
 ```bash
 deeplydep -p /path/to/solution.sln --no-parallel --show-build-output
 ```
 
----
+## Dependency graph examples
 
-## Dependency Graph Examples
+Test solution: [dotnet-mono-repo-example](https://github.com/Shaikh-Imran/dotnet-mono-repo-example) (for cycle detection, see the [`cyclic-dep`](https://github.com/Shaikh-Imran/dotnet-mono-repo-example/tree/cyclic-dep) branch).
 
-Sample repository for testing: [dotnet-mono-repo-example](https://github.com/Shaikh-Imran/dotnet-mono-repo-example) (for cycle detection, see the [`cyclic-dep`](https://github.com/Shaikh-Imran/dotnet-mono-repo-example/tree/cyclic-dep) branch).
+### Simple example
 
-### Simple Example
-
-#### Project Structure
+#### Project structure
 ```mermaid
 graph TD
 
@@ -166,7 +141,7 @@ P2 --> P3
 P3 --> P4
 ```
 
-#### Topological Sort
+#### Topological sort
 ```mermaid
 flowchart TD
 
@@ -176,7 +151,7 @@ P2 --> P1["P1"]
 P1 --> MS["my Solution"]
 ```
 
-#### Topological Sort with Levels
+#### Topological sort with levels
 ```mermaid
 flowchart TD
     subgraph Level0
@@ -204,11 +179,9 @@ Level1 --> Level2
 Level2 --> Level3
 ```
 
----
+### Complex example
 
-### Complex Example
-
-#### Project Structure
+#### Project structure
 ```mermaid
 graph TD
 
@@ -237,7 +210,7 @@ P6 --> P7
 P5 --> P7
 ```
 
-#### Topological Sort
+#### Topological sort
 ```mermaid
 flowchart TD
 
@@ -251,7 +224,7 @@ P1 --> P8["P8"]
 P8 --> MS["my Solution"]
 ```
 
-#### Topological Sort with Level Groups
+#### Topological sort with level groups
 ```mermaid
 flowchart TD
 
@@ -290,21 +263,17 @@ Level2 --> Level3
 Level3 --> Level4
 ```
 
----
-
 ## Roadmap
 
 - [x] Graph visualization
 - [x] Graph cycle detection
 - [x] Graph level grouping
-- [x] Graph level-parallel build
+- [x] Parallel build by level
 - [x] Clean build
-- [ ] Skip build if target is already up-to-date
-- [ ] Path shortening in graph for cleaner visualization
+- [ ] Skip build if project is up to date
+- [ ] Shorten paths in graph output
 - [ ] Terminal-based graph visualization
-
----
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+[MIT](LICENSE)
